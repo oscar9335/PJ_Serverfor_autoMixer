@@ -54,44 +54,62 @@ def download():
 
 
 
-# for further develop
-# I should add a String that save the file to the specific file 
-# such as I type 2341 on android app and this number will be get to flask server 
-# and then mkdir a dir [2341] after that all the files type this num will be saved in that
+
 @app.route("/Audio_store",methods=['GET', 'POST'])
 def audio():
     if request.files:
+        room_number = request.form["room_number"]
         audio_txt = request.files["audio_info"]
         audio = request.files["audio"]
 
-        audio.save(os.path.join(file_save_path,audio.filename))
-        audio_txt.save(os.path.join(file_save_path,audio_txt.filename))
+        #create a room dir for store files
+        roomdir = file_save_path + "/" + room_number
+        CHECK_FOLDER = os.path.isdir(roomdir)
+        if not CHECK_FOLDER:
+            os.makedirs(roomdir)
+            print("created folder : ", roomdir)
+        else:
+            print( roomdir, "folder already exists.")
+
+        #store the file in the specific dir
+        audio.save(os.path.join(roomdir,audio.filename))
+        audio_txt.save(os.path.join(roomdir,audio_txt.filename))
 
         print("audio saved")
-
         return "OK, Audio upload finished"
-        
+
     else:
         return "Something went wrong while upload audio!!!"
 
 @app.route("/Video_store",methods=['GET', 'POST'])
 def video():
     if request.files:
+        room_number = request.form["room_number"]
         video_txt = request.files["video_info"]
         video = request.files["video"]
 
         videoname = video.filename
 
-        for dirPath, dirNames, all_files in walk(file_save_path):
+        #create a room dir for store files
+        roomdir = file_save_path + "/" + room_number
+        CHECK_FOLDER = os.path.isdir(roomdir)
+        if not CHECK_FOLDER:
+            os.makedirs(roomdir)
+            print("created folder : ", roomdir)
+        else:
+            print( roomdir, "folder already exists.")
+
+        for dirPath, dirNames, all_files in walk(roomdir):
             for afile in all_files:
                 print(afile)
                 print(type(afile))
                 if afile == videoname:
                     return "You have already uploaded the Video"
 
-        video.save(os.path.join(file_save_path,video.filename))
-        video_txt.save(os.path.join(file_save_path,video_txt.filename))
-
+        #store the file in the specific dir
+        video.save(os.path.join(roomdir,video.filename))
+        video_txt.save(os.path.join(roomdir,video_txt.filename))
+        
         print("video saved")
         return "OK, Video upload finished"
     else:
