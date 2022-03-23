@@ -18,7 +18,7 @@ def home():
 
 @app.route('/Room', methods=['GET', 'POST'])
 def room():
-
+    
     # the return OK & No & Yes is important message for client to know if the Room is existed or not
     action = request.form["action"]
     
@@ -42,6 +42,17 @@ def room():
         
     return "Check internet connection!"
 
+@app.route('/Compose' ,methods = ['GET', 'POST'])
+def compose():
+    room_number = request.form["room_number"]
+    # do = request.form["compose_file"]
+
+    # here use the mixer
+    # ....
+
+    return "In compose"
+
+
 
 # the roomnumber will be post to server when client use the postRoom to create or join the room 
 aroomnum = str(1)   
@@ -49,10 +60,21 @@ aroomnum = str(1)
 @app.route('/Download' + aroomnum , methods=['GET', 'POST'])
 def download():
     # if exist the route do the following
-    print("Check reacton")
-    return send_file("store_files\Atest.mp4", download_name = "Atest.mp4")
+    # room_number = request.form["room_number"]
+    roomdir = file_save_path + "/" + aroomnum
 
+    for dirPath, dirNames, all_files in walk(roomdir):
+        for afile in all_files:
+            print(afile)
+            print(type(afile))
+            if afile == "composed.mp4":
+                filepath = roomdir + "/" + "composed.mp4"
+                print("Check reacton")
+                return send_file(filepath, download_name = "composed.mp4")
 
+    return "Haven't composed yet!!!"
+
+    
 
 
 @app.route("/Audio_store",methods=['GET', 'POST'])
@@ -62,6 +84,8 @@ def audio():
         audio_txt = request.files["audio_info"]
         audio = request.files["audio"]
 
+        audioname = audio.filename
+
         #create a room dir for store files
         roomdir = file_save_path + "/" + room_number
         CHECK_FOLDER = os.path.isdir(roomdir)
@@ -70,6 +94,13 @@ def audio():
             print("created folder : ", roomdir)
         else:
             print( roomdir, "folder already exists.")
+
+        for dirPath, dirNames, all_files in walk(roomdir):
+            for afile in all_files:
+                print(afile)
+                print(type(afile))
+                if afile == audioname:
+                    return "You have already uploaded the Audio"
 
         #store the file in the specific dir
         audio.save(os.path.join(roomdir,audio.filename))
