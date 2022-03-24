@@ -2,10 +2,21 @@ import os
 import time_count as count
 from moviepy.editor import *
 
+
 basepath = 'files'
 
+
 video_file = count.get_video_file(basepath)
+print(video_file)
+print(type(video_file))
+
+
+
+
 video_time_gap = count.video_time_info_gap(video_file,basepath)
+print(video_time_gap)
+print(type(video_time_gap))
+
 video_time_gap_float = video_time_gap/1000
 
 audio_file = count.get_audio_file(basepath)
@@ -66,4 +77,4 @@ for the_audio in audio_file:
 audio_compose = CompositeAudioClip(all_audio)
 new_video = main_video.set_audio(audio_compose)
 
-new_video.write_videofile(filename="my_test2.mp4",codec='libx264')
+new_video.write_videofile(filename="files\composed.mp4",codec='libx264')

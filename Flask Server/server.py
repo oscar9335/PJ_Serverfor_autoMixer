@@ -1,8 +1,11 @@
+
 import flask
-import werkzeug
+# import werkzeug
 from flask import request, send_file
 import os
 from os import walk
+
+import util.mixer_ver1 as mixer
 
 app = flask.Flask(__name__)
 
@@ -16,9 +19,11 @@ def home():
 
     return "Hello /"
 
+
+
+
 @app.route('/Room', methods=['GET', 'POST'])
 def room():
-    
     # the return OK & No & Yes is important message for client to know if the Room is existed or not
     action = request.form["action"]
     
@@ -37,20 +42,31 @@ def room():
             if existed_room == room_number:
                 print("JOIN LOL")
                 return "Yes, room join success"
-        
+    
         return "No, room doesn't exist, please press CREATE "
         
     return "Check internet connection!"
 
+
+
+
 @app.route('/Compose' ,methods = ['GET', 'POST'])
 def compose():
     room_number = request.form["room_number"]
-    # do = request.form["compose_file"]
-
-    # here use the mixer
-    # ....
-
-    return "In compose"
+    do = request.form["compose_file"]
+    # return "testtest"
+    if do == "compose":
+        roomdir = file_save_path + "/" + room_number
+        composed_video = mixer.compose_the_mastepice(roomdir)
+        if composed_video == "OK":
+            print("Compose successful")
+            return "Compose successful!!!"
+        else:
+            return "failed : NO compose !!!" + composed_video
+    
+    else:
+        return "Something wrong with request!"
+  
 
 
 
@@ -112,6 +128,9 @@ def audio():
     else:
         return "Something went wrong while upload audio!!!"
 
+
+
+
 @app.route("/Video_store",methods=['GET', 'POST'])
 def video():
     if request.files:
@@ -146,6 +165,14 @@ def video():
     else:
         return "Something went wrong while upload video!!!"
 
+
+
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
+
+
+
 
