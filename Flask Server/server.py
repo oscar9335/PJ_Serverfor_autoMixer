@@ -1,4 +1,3 @@
-
 import flask
 # import werkzeug
 from flask import request, send_file
@@ -12,12 +11,29 @@ app = flask.Flask(__name__)
 file_save_path = "store_files"
 # step1: this list is to contain the room in service, 
 # step2: once all the participation download the file , remove the # from list  
+
 list_room = []   #String
+room_info_dic = {}
+
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
 
     return "Hello /"
+
+@app.route('/sendsettingtoclient', methods=['GET', 'POST'])
+def sendsettingtoclient():
+    roomtosend = request.form["roomcode"]
+    if roomtosend:
+        print("request success in [homepage]")
+        roomFramerateinfo_key = "room" + roomtosend + "framerate"
+        roomFramerateinfo_value = room_info_dic[roomFramerateinfo_key]
+        print(roomFramerateinfo_value)
+        
+        return roomFramerateinfo_value
+
+    else:
+        return "Error no room number"
 
 
 
@@ -26,7 +42,6 @@ def home():
 def room():
     # the return OK & No & Yes is important message for client to know if the Room is existed or not
     action = request.form["action"]
-    
     room_number = request.form["room_number"]
 
     if(action == "CREATE"):
@@ -34,9 +49,12 @@ def room():
         for existed_room in list_room:
             if existed_room == room_number:
                 return "No, Existed Room"
-        list_room.append(room_number)
+
+        # not yet append to room list until setting confirm
+        print("create debug")
         print(list_room)
         return "Ok, Room Create Successful"
+
     elif(action == "JOIN"):
         for existed_room in list_room:
             if existed_room == room_number:
@@ -47,7 +65,28 @@ def room():
         
     return "Check internet connection!"
 
+@app.route('/Setting', methods = ['POST'])
+def config_setting():
+    
+    room_number_forsaveuse = request.form["roomnumbersetting"]
+    audioframerate = request.form["audioSetting"]
 
+    if room_number_forsaveuse:
+        # room1234framerate 
+        framerate_key = "room" + room_number_forsaveuse + "framerate"
+        room_info_dic[framerate_key] = audioframerate
+
+        # the room is created until confirm bt click
+        list_room.append(room_number_forsaveuse)
+
+        print(list_room)
+
+        print(room_info_dic) # debug usage
+
+        #correct return "SUCCESS"
+        return 'SUCCESS'
+    else:   
+        return "Nothing receive"
 
 
 @app.route('/Compose' ,methods = ['GET', 'POST'])
