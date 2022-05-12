@@ -22,10 +22,10 @@ def get_video_file(basepath):  # saved in array cina a basepath of file
             return video_file
 
 def specific_audio_time_info_gap(audio_file,basepath):
-    audio_name = audio_file.removesuffix(".3gp")
+    audio_name = audio_file[:-4]
     for f_name in os.listdir(basepath):
         audio_timeinfo = f_name.strip('audio_time_info')
-        audio_timeinfo = audio_timeinfo.removesuffix('.txt')
+        audio_timeinfo = audio_timeinfo[:-4]
         if audio_timeinfo == audio_name:  #found the info txt we wnat now open it to read info
             if os.path.isfile(os.path.join(basepath, f_name)):
                 line_number = 2
@@ -82,15 +82,15 @@ def videostart_minus_audiostart(video_file,audio_file,basepath):
     long_audio_start = 0
     long_video_start = 0
 
-    video_name = video_file.removesuffix(".mp4")
-    audio_name = audio_file.removesuffix(".3gp")
+    video_name = video_file[:-4]
+    audio_name = audio_file[:-4]
 
     for f_name in os.listdir(basepath):
         audio_start_timeinfo = f_name.strip('audio_time_info')
-        audio_start_timeinfo = audio_start_timeinfo.removesuffix('.txt')
+        audio_start_timeinfo = audio_start_timeinfo[:-4]
 
         video_start_timeinfo = f_name.strip('video_time_info')
-        video_start_timeinfo = video_start_timeinfo.removesuffix('.txt')
+        video_start_timeinfo = video_start_timeinfo[:-4]
 
         if audio_start_timeinfo == audio_name:
             if os.path.isfile(os.path.join(basepath, f_name)):
@@ -140,15 +140,15 @@ def videoend_minus_audioend(video_file,audio_file,basepath):
     long_audio_end = 0
     long_video_end = 0
 
-    video_name = video_file.removesuffix(".mp4")
-    audio_name = audio_file.removesuffix(".3gp")
+    video_name = video_file[:-4]
+    audio_name = audio_file[:-4]
 
     for f_name in os.listdir(basepath):
         audio_end_timeinfo = f_name.strip('audio_time_info')
-        audio_end_timeinfo = audio_end_timeinfo.removesuffix('.txt')
+        audio_end_timeinfo = audio_end_timeinfo[:-4]
 
         video_end_timeinfo = f_name.strip('video_time_info')
-        video_end_timeinfo = video_end_timeinfo.removesuffix('.txt')
+        video_end_timeinfo = video_end_timeinfo[:-4]
 
         if audio_end_timeinfo == audio_name:
             if os.path.isfile(os.path.join(basepath, f_name)):
@@ -196,8 +196,8 @@ def videoend_minus_audioend(video_file,audio_file,basepath):
 
 
 def video_minus_audio(videofile,audiofile,basepath):
-    audio_name = audiofile.removesuffix(".3gp")
-    video_name = videofile.removesuffix(".mp4")
+    audio_name = audiofile[:-4]
+    video_name = videofile[:-4]
 
     long_audio_start = 0
     long_audio_end = 0
@@ -210,10 +210,10 @@ def video_minus_audio(videofile,audiofile,basepath):
     for f_name in os.listdir(basepath):
         #audio
         audio_timeinfo = f_name.strip('audio_time_info')
-        audio_timeinfo = audio_timeinfo.removesuffix('.txt')
+        audio_timeinfo = audio_timeinfo[:-4]
         #video
         video_timeinfo = f_name.strip('video_time_info')
-        video_timeinfo = video_timeinfo.removesuffix('.txt')
+        video_timeinfo = video_timeinfo[:-4]
 
         if audio_timeinfo == audio_name:  #found the info txt we wnat now open it to read info
             if os.path.isfile(os.path.join(basepath, f_name)):
@@ -313,10 +313,10 @@ def video_minus_audio(videofile,audiofile,basepath):
 
 
 def video_time_info_gap(video_file,basepath):
-    video_name = video_file.removesuffix(".mp4")
+    video_name = video_file[:-4]
     for f_name in os.listdir(basepath):
         video_timeinfo = f_name.strip('video_time_info')
-        video_timeinfo = video_timeinfo.removesuffix('.txt')
+        video_timeinfo = video_timeinfo[:-4]
         if video_timeinfo == video_name:  #found the info txt we wnat now open it to read info
             if os.path.isfile(os.path.join(basepath, f_name)):
                 line_number = 2
