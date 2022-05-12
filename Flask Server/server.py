@@ -129,7 +129,6 @@ def download():
 
     return "Haven't composed yet!!!"
 
-    
 
 
 @app.route("/Audio_store",methods=['GET', 'POST'])
@@ -138,6 +137,28 @@ def audio():
         room_number = request.form["room_number"]
         audio_txt = request.files["audio_info"]
         audio = request.files["audio"]
+
+        # test if the above three request acquired 
+        ### this is for degug ###
+        if(room_number == NULL):
+            print("Error no room number acquired!!!")
+            return "room_number not post successfully!!"
+        else:
+            print("Room number is:{name}".format(name = room_number))
+        if(audio_txt == NULL):
+            print("Error no audio_txt(info) acquired!!!")
+            return "audio_txt not post successfully!!"
+        else:
+            print("Yes you acquired a audio txt information!") 
+            print("This is a :{name}".format(name = type(audio_txt)))   
+        if(audio == NULL):
+            print("Error no audio acquired!!!")
+            return "audio not post successfully!!"
+        else:
+            print("Yes you acquired a audio ") 
+            print(audio.filename)
+            print("This is a :{name}".format(name = type(audio)))
+        ### this is for debug ###
 
         audioname = audio.filename
 
