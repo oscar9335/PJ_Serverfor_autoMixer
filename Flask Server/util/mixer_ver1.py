@@ -1,69 +1,122 @@
-# import os
-
-
 import util.time_count as count
 from moviepy.editor import *
 
 
-# basepath = 'files'
+# video_file_name = video file name(String)
+# video_time_gap: find the correponding video info .txt using video_file_name 
+# video_time_gap_float making the time into float 
 
-# will compose all the files together as one composed.mp4 file
 def compose_the_mastepice(basepath):
-    video_file = count.get_video_file(basepath)
-    video_time_gap = count.video_time_info_gap(video_file,basepath)
+
+    # to get the video file name
+    # to get the video time Duration with floating number in [video_time_gap_float]
+    video_file_name = count.get_video_file(basepath)
+    video_time_gap = count.video_time_info_gap(video_file_name,basepath)
     video_time_gap_float = video_time_gap/1000
 
+    # receive a list in audio_file[]
     audio_file = count.get_audio_file(basepath)
-    # print(afloat)
+    all_audio = [] 
+    
 
-    #(0,afloat could be ignore since the video has to be the raw one)
-    main_video = VideoFileClip(basepath + "/" + video_file).subclip(0,video_time_gap_float)
-    all_audio = []  
+    # (0,afloat could be ignore since the video has to be the raw one)
+    # main_video = VideoFileClip(basepath + "/" + video_file_name).subclip(0,video_time_gap_float)
+    main_video = VideoFileClip(basepath + "/" + video_file_name) 
 
+    # prune audios time info one by one
     for the_audio in audio_file:
+
+        # receive one audio duration at a time
+        the_audio_time_gap = count.specific_audio_time_info_gap(the_audio,basepath)
+        the_audio_duration = the_audio_time_gap/1000
+
         start_place = 0
         start_place_float = 0.0
+        
         end_place = 0
         end_place_float = 0.0
+
         starting_time = 0
         starting_time_float = 0.0
 
-        the_audio_time_gap = count.specific_audio_time_info_gap(the_audio,basepath)
-        the_duration = the_audio_time_gap/1000
+        #obtain [start_diff,end_diff]
+        startdiff_enddiff = count.video_minus_audio(video_file_name,the_audio,basepath)
 
-        #obtain [#######1,######2]
+    # Note #
+    # start_diff = long_video_start - long_audio_start
+    #   @ using video start time - audio start time
+    #   @@ if video start eleaier then audio -> the start_diff is negative
+    #   @@ if video start later then audio -> the start_diff is positive
 
-        start_end = count.video_minus_audio(video_file,the_audio,basepath)
-        if (start_end[0] < 0): 
-            # video start earlier than audio
-            # Use CompositeAudioClip with clip.set_start().
-            starting_time = (-1) * start_end[0]
+    # end_diff = long_video_end - long_audio_end
+    #   @ using video end time - audio end time
+    #   @@ if video end eleaier then audio -> the end_diff is negative
+    #   @@ if video end later then audio -> the end_diff is positive     
+        
+    # Use case 1
+    # video start earlier than audio
+    # Use CompositeAudioClip with clip.set_start().
+        if (startdiff_enddiff[0] < 0): 
+            starting_time = (-1) * startdiff_enddiff[0]
             starting_time_float = starting_time/1000
 
-            
-            
-        elif (start_end[0] > 0):# video start later than audio
-            start_place = start_end[0]
+    # Use case 2
+    # video start later than audio
+    # Use CompositeAudioClip with clip.set_start().
+        elif (startdiff_enddiff[0] > 0):# video start later than audio
+            start_place = startdiff_enddiff[0]
             start_place_float = start_place/1000
 
-        if (start_end[1] < 0):# video end earlier than audio
+    # Use case 3-1 3-2
+    # video end earlier than audio
+
+    # video start earlier than audio
+    # 3-1             start                                   end   
+    # audio time                 ****************************
+    # video time            ***************************
+
+    # video start later than audio 
+    # 3-2
+    # audio time             ********************************
+    # video time                 *******************
+        if (startdiff_enddiff[1] < 0):
+            # video start earlier than audio so audio append from time {start of audio to end of video}
             if (starting_time_float > 0):
                 audio_set = AudioFileClip(basepath + "/" + the_audio).subclip(0.0,video_time_gap_float - starting_time_float)
                 audio_set = audio_set.set_start(starting_time_float)
                 all_audio.append(audio_set)
-                
-            else:
+
+            # video start later than audio    
+            else: # starting_time_float == 0
+                print("PPPPP")
+                print(start_place_float)
+                print(video_time_gap_float)
+                print(start_place_float + video_time_gap_float)
+                print("PPPPP")
                 audio_set = AudioFileClip(basepath + "/" + the_audio).subclip(start_place_float,start_place_float + video_time_gap_float)
                 all_audio.append(audio_set)
 
+    # Use case 4-1 4-2
+    # video end later than audio
 
-        elif (start_end[1] > 0):# video end later than audio
+    # video start earlier than audio
+    # 4-1          start                                        end
+    # audio time            ****************************
+    # video time       ***************************************
+
+    # video start later than audio
+    # 4-2
+    # audio time        ****************************       
+    # video time              ********************************
+
+        elif (startdiff_enddiff[1] > 0):# video end later than audio
             if (starting_time_float > 0):
-                audio_set = AudioFileClip(basepath + "/" + the_audio).subclip(0.0,the_duration)
+                audio_set = AudioFileClip(basepath + "/" + the_audio).subclip(0.0)
                 audio_set = audio_set.set_start(starting_time_float)
                 all_audio.append(audio_set)
-            else:
-                audio_set = AudioFileClip(basepath + "/" + the_audio).subclip(start_place_float)
+            else: # starting_time_float == 0
+                # audio_set = AudioFileClip(basepath + "/" + the_audio).subclip(start_place_float) 
+                audio_set = AudioFileClip(basepath + "/" + the_audio).subclip(0,start_place_float - the_audio_duration) 
                 all_audio.append(audio_set)
         
 
@@ -71,9 +124,14 @@ def compose_the_mastepice(basepath):
     audio_compose = CompositeAudioClip(all_audio)
     new_video = main_video.set_audio(audio_compose)
 
-    if new_video.write_videofile(filename= basepath + "\composed.mp4",codec='libx264'):
+    if new_video.write_videofile(filename= basepath + "\composed.mp4",codec='libx264',preset = "ultrafast"):
         return "OK"
     else:
         return "something went wrong"
    
     
+
+# note #
+# subclip If t_end is not provided, it is assumed to be the duration of the clip
+#         If t_end is a negative value, it is reset to ``clip.duration + t_end. ``
+#         If normally set t_end (t_start,t_end) is the start timestamp and end timestamp
