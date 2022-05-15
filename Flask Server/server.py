@@ -1,6 +1,7 @@
+from asyncio.windows_events import NULL
 import flask
 # import werkzeug
-from flask import request, send_file
+from flask import request, send_file, redirect, url_for
 import os
 from os import walk
 
@@ -14,12 +15,13 @@ file_save_path = "store_files"
 
 list_room = []   #String
 room_info_dic = {}
+aroomnum = str(99999)
 
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
 
-    return "Hello /"
+    return "Hello"
 
 @app.route('/sendsettingtoclient', methods=['GET', 'POST'])
 def sendsettingtoclient():
@@ -110,18 +112,33 @@ def compose():
 
 
 # the roomnumber will be post to server when client use the postRoom to create or join the room 
-aroomnum = str(1)   
+# aroomnum = str(1)
+@app.route('/Download_get_roomnumber',methods=['GET', 'POST'])
+def dwgetroom():
+    room_number = request.form["roomcode"]
+    # print(type(room_number))
+    print("in dwgetroom:" + room_number )
+    if room_number:
+        print("downloading")
+        return redirect(url_for('download',aroomnum = str(room_number)))
+    else:
+        print("NOOB")
+        return "NOOB"
+
+   
 # if the route is not existed then Not Found
-@app.route('/Download' + aroomnum , methods=['GET', 'POST'])
-def download():
+# aroomnum parameter will attach the room number to it
+@app.route('/Download/<aroomnum>', methods=['GET', 'POST'])
+def download(aroomnum):
     # if exist the route do the following
     # room_number = request.form["room_number"]
     roomdir = file_save_path + "/" + aroomnum
-
+    print(roomdir)
+    
     for dirPath, dirNames, all_files in walk(roomdir):
         for afile in all_files:
             print(afile)
-            print(type(afile))
+            # print(type(afile))
             if afile == "composed.mp4":
                 filepath = roomdir + "/" + "composed.mp4"
                 print("Check reacton")
@@ -129,6 +146,7 @@ def download():
 
     return "Haven't composed yet!!!"
 
+    
 
 
 @app.route("/Audio_store",methods=['GET', 'POST'])
@@ -160,6 +178,7 @@ def audio():
             print("This is a :{name}".format(name = type(audio)))
         ### this is for debug ###
 
+
         audioname = audio.filename
 
         #create a room dir for store files
@@ -171,10 +190,12 @@ def audio():
         else:
             print( roomdir, "folder already exists.")
 
+        print()
+
         for dirPath, dirNames, all_files in walk(roomdir):
             for afile in all_files:
                 print(afile)
-                print(type(afile))
+                #print(type(afile))
                 if afile == audioname:
                     return "You have already uploaded the Audio"
 
