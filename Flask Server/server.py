@@ -85,6 +85,8 @@ def config_setting():
 
         print(room_info_dic) # debug usage
 
+
+
         #correct return "SUCCESS"
         return 'SUCCESS'
     else:   
@@ -95,10 +97,20 @@ def config_setting():
 def compose():
     room_number = request.form["room_number"]
     do = request.form["compose_file"]
+
+    room_info_dic_this_key = "room" + room_number + "framerate"
+    for_room_audio_fps = int(room_info_dic[room_info_dic_this_key])
+
+    print(type(for_room_audio_fps))
+    print(for_room_audio_fps)
+
+
     # return "testtest"
     if do == "compose":
         roomdir = file_save_path + "/" + room_number
-        composed_video = mixer.compose_the_mastepice(roomdir)
+        composed_video = mixer.compose_the_mastepice(roomdir,for_room_audio_fps)
+        print(composed_video)
+        
         if composed_video == "OK":
             print("Compose successful")
             return "Compose successful!!!"
