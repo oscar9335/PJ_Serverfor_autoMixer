@@ -126,12 +126,28 @@ def compose_the_mastepice(basepath,fps_audio):
 
     # audio_compose.write_audiofile(filename= basepath + "\composedaudio.mp3", fps = fps_audio,codec = "libmp3lame")
 
-    new_video = main_video.set_audio(audio_compose)
+    #  new_video = main_video.set_audio(audio_compose)
 
-    if new_video.write_videofile(filename= basepath + "\composed.mp4",codec='libx264',preset = "ultrafast"):
-        return "something went wrong"
-    else:
+    audio_compose.write_audiofile(filename= basepath + "\composedaudio.mp3", fps = fps_audio,codec = "libmp3lame")
+
+    # if new_video.write_videofile(filename= basepath + "\composed.mp4",codec='libx264',preset = "ultrafast"):
+    #     return "something went wrong"
+    # else:
+    #     return "OK"
+
+    import ffmpeg
+
+    # mute the audio there 
+    video = ffmpeg.input(basepath + '/' + video_file_name,**{'an':None})
+
+    audio = ffmpeg.input(basepath + '/' + 'composedaudio.mp3')
+
+    stream = ffmpeg.output(video, audio, basepath + "/" + "composed.mp4")
+
+    if ffmpeg.run(stream):
         return "OK"
+    else:
+        return "something went wrong"
    
     
 
