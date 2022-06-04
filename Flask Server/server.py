@@ -8,7 +8,10 @@ from datetime import datetime
 
 import util.mixer_ver1 as mixer
 
+from flask_autoindex import AutoIndex
+
 app = flask.Flask(__name__)
+AutoIndex(app, browse_root=os.path.curdir)
 
 file_save_path = "store_files"
 # step1: this list is to contain the room in service, 
@@ -21,7 +24,6 @@ aroomnum = str(99999)
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-
     return "Hello"
 
 @app.route('/sendsettingtoclient', methods=['GET', 'POST'])
@@ -249,10 +251,12 @@ def video():
 
         for dirPath, dirNames, all_files in walk(roomdir):
             for afile in all_files:
-                print(afile)
-                print(type(afile))
+                # print(afile[-4:])
+                # print(type(afile))
                 if afile == videoname:
                     return "You have already uploaded the Video"
+                if afile[-4:] == ".mp4":
+                    return "Server have already exist a video file"
 
         #store the file in the specific dir
         video.save(os.path.join(roomdir,video.filename))
@@ -272,7 +276,6 @@ def synchronize():
     if date_request:
     # yyyy_MM_dd_hh_mm_ss_SSS
     # ex: 2022_05_20_17_36_45_485
-    
         date_send = datetime.now().strftime("%Y_%m_%d_%H_%M_%S_%f")[:-3]
         print(date_send)
         # print(type(date_send))
