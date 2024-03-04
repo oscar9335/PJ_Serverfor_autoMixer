@@ -1,2 +1,2 @@
 # ServerforProject
-A
+[APP_proposal.pdf]
